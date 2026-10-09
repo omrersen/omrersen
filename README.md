@@ -1,7 +1,7 @@
 # Hi, I'm Ömer Şen
 
 **Computer Programming Student | Aspiring Software Developer**  
-Düzce University · Türkiye
+
 
 I’m interested in software development, practical problem-solving, and turning what I learn into useful projects. I value clear code, reliable tools, and documentation that helps others understand how things work.
 
