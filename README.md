@@ -19,10 +19,11 @@ I’m interested in software development, practical problem-solving, and turning
 - Turning learning exercises into practical, reproducible projects.
 - Developing a portfolio of projects I can explain and demonstrate.
 
-## Technologies & tools I'm exploring
+## 💻 Programming Languages
 
-`Lua` · `Git` · `GitHub` · `PowerShell` · `Markdown`
-
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![C++](https://img.shields.io/badge/C%2B%2B-00599C?style=for-the-badge&logo=cplusplus&logoColor=white)
+![Lua](https://img.shields.io/badge/Lua-2C2D72?style=for-the-badge&logo=lua&logoColor=white)
 ## Selected projects
 
 I'm reviewing and documenting my work. I'll add selected **public, verified, and well-documented** projects here as they're ready to share.
