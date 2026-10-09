@@ -1,16 +1,38 @@
-## Hi there 👋
+# Hi, I'm Ömer Şen
 
-<!--
-**omrersen/omrersen** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+**Computer Programming Student | Aspiring Software Developer**  
+Düzce University · Türkiye
 
-Here are some ideas to get you started:
+I’m interested in software development, practical problem-solving, and turning what I learn into useful projects. I value clear code, reliable tools, and documentation that helps others understand how things work.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+## About me
+
+- Studying **Computer Programming** at Düzce University.
+- Exploring **Lua scripting**, **automation**, and software-development fundamentals.
+- Using **Git and GitHub** to organize, document, and improve my work.
+- Building my skills through hands-on learning and experimentation.
+
+## Current focus
+
+- Strengthening my programming fundamentals and problem-solving skills.
+- Writing more readable, maintainable, and well-documented code.
+- Turning learning exercises into practical, reproducible projects.
+- Developing a portfolio of projects I can explain and demonstrate.
+
+## Technologies & tools I'm exploring
+
+`Lua` · `Git` · `GitHub` · `PowerShell` · `Markdown`
+
+## Selected projects
+
+I'm reviewing and documenting my work. I'll add selected **public, verified, and well-documented** projects here as they're ready to share.
+
+## Connect
+
+- **GitHub:** [@omrersen](https://github.com/omrersen)
+
+---
+
+### Türkçe
+
+Merhaba! Ben **Ömer Şen**, Düzce Üniversitesi Bilgisayar Programcılığı öğrencisiyim. Yazılım geliştirme, problem çözme ve yeni teknolojiler öğrenme üzerine çalışıyorum. Amacım, öğrendiklerimi anlaşılır, güvenilir ve iyi belgelenmiş projelere dönüştürmek.
