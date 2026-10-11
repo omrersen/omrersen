@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#121720"><title>Mayın Çözücü — iPhone</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eef4fa;background:#121720;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0}main{max-width:680px;margin:auto;padding:18px 12px 70px}h1{margin:8px 0 5px;font-size:24px;letter-spacing:-.6px}p{line-height:1.5}.muted{color:#aab6c6;font-size:13px}.top{display:flex;align-items:center;gap:9px}.dot{width:11px;height:11px;background:#35d48d;border-radius:50%;box-shadow:0 0 14px #35d48d}.panel{border:1px solid #364150;border-radius:16px;background:#1c2430;padding:13px;margin-top:14px}.flex{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.grow{flex:1}
+button,.file-btn,select{border:1px solid #526073;background:#2c394b;color:white;border-radius:10px;cursor:pointer;font:600 14px system-ui;padding:10px 12px}button:active{transform:scale(.98)}button.primary,.file-btn{background:#2376cd;border-color:#2376cd}.file-btn input{display:none}button.warn{background:#6b3138;border-color:#96444e}button.selected{background:#60bfff;color:#061322;border-color:#b6e4ff}button:disabled{opacity:.5;cursor:not-allowed}button:focus-visible{outline:2px solid #fff;outline-offset:2px}.hint{color:#aab6c6;font-size:13px;margin-top:8px;line-height:1.45}.notice{padding:9px;border-radius:10px;background:#293242;font-size:13px;line-height:1.45;margin-top:10px}
+.board-shell{margin:0 auto;max-width:640px}.board{width:100%;aspect-ratio:1;display:block;background:#3a3f47;touch-action:manipulation;image-rendering:pixelated;border:2px solid #4b5969;border-radius:6px}.board-wrap{position:relative}.legend{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0 4px;font-size:13px}.legend span{white-space:nowrap}.sw{display:inline-block;width:13px;height:13px;border-radius:4px;margin-right:5px;vertical-align:-2px}.safe{background:#35e18a}.mine{background:#f75a6a}.first{background:#ffd454}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{text-align:center;background:#283344;padding:12px 5px;border-radius:12px}.stat strong{font-size:27px;display:block}.stat small{font-size:11px;color:#c2cddd}.editbar{display:flex;gap:5px;flex-wrap:wrap}.editbar button{min-width:39px;padding:9px 6px}.editbar button:nth-child(5){color:#74bdff}.editbar button:nth-child(6){color:#30ef89}.editbar button:nth-child(7){color:#f56774}.editbar button:nth-child(8){color:#cd76ed}.editbar button:last-child{color:#fb7b88}.subhead{font-size:16px;margin:5px 0 8px;font-weight:700}.shotcanvas{display:block;width:100%;height:auto;border:1px solid #44576d;border-radius:6px;touch-action:manipulation}.hidden{display:none!important}.steps{margin:10px 0;padding-left:22px;font-size:14px;color:#c3ccd8;line-height:1.65}.steps li{padding-bottom:4px}.chip{display:inline-block;padding:5px 9px;background:#374656;border-radius:8px;margin:3px 5px 3px 0;font-size:12px}.progress{font-weight:700;color:#91fbc2}.bad{color:#ff9299}.footer{text-align:center;font-size:12px;color:#899aab;margin-top:18px}
+</style></head><body><main>
+<div class="top"><div class="dot"></div><h1>Mayın Çözücü</h1></div>
+<div class="muted">iPhone sürümü · Fotoğraftan okuma · Çevrimdışı hesaplama</div>
+<div class="panel">
+ <div class="flex"><label class="file-btn">📷 Ekran görüntüsü seç<input type="file" id="file" accept="image/*"></label><button id="demo">Örnek tahtayı aç</button><button id="clear">Temizle</button></div>
+ <div class="hint">iPhone'da oyun ekranının görüntüsünü al, buradan seç. Görüntü yalnızca cihazında işlenir; hiçbir yere gönderilmez.</div>
+ <div id="photoInfo" class="notice">Hazır: örnek tahtayı açarak hemen test edebilir veya kendi ekran görüntünü yükleyebilirsin.</div>
+</div>
+<details id="calib" class="panel hidden"><summary class="subhead">Ekran hizalaması (gerektiğinde aç)</summary>
+  <div class="muted">Kareler yanlış okunursa önce <b>Sol üst</b> sonra <b>Sağ alt</b> seç; resimde oyun ızgarasının tam köşelerine dokun.</div>
+  <div class="flex" style="margin:10px 0"><button id="topleft">1. Sol üst</button><button id="bottomright">2. Sağ alt</button><button id="rescan" class="primary">Yeniden oku</button></div>
+  <canvas id="preview" class="shotcanvas"></canvas>
+  <div id="calmsg" class="hint">Ekranı otomatik olarak hizaladım. Gerekirse köşeleri düzelt.</div>
+</details>
+<div class="panel">
+ <div class="flex" style="justify-content:space-between"><div class="subhead">Oyun tahtası · 16 × 16</div><button id="solve" class="primary">Analiz et</button></div>
+ <div class="board-shell board-wrap"><canvas id="board" class="board" width="640" height="640" aria-label="Mayın Tarlası çözüm alanı"></canvas></div>
+ <div class="legend"><span><span class="sw first"></span>İlk hamle</span><span><span class="sw safe"></span>Güvenli</span><span><span class="sw mine"></span>Bayrak koy</span></div>
+ <div class="stats"><div class="stat"><strong id="safeCount">0</strong><small>Güvenli</small></div><div class="stat"><strong id="mineCount">0</strong><small>Mayın</small></div><div class="stat"><strong id="unknownCount">256</strong><small>Kapalı kare</small></div></div>
+ <div id="status" class="notice">Bir ekran görüntüsü yükle veya örnek tahta ile başla.</div>
+ <div id="moves" class="hint"></div>
+</div>
+<div class="panel"><div class="subhead">Yanlış okunan kareyi düzelt</div>
+  <div class="muted">Aşağıdan kare türünü seç, sonra tahtadaki kareye dokun. Düzelttikten sonra <b>Analiz et</b> düğmesine bas.</div>
+  <div id="types" class="editbar" style="margin-top:10px"></div>
+  <div id="lastEdit" class="hint">Seçili tür: Kapalı</div>
+</div>
+<div class="panel"><div class="subhead">Önemli sınır</div><p class="muted">Bu prototip fotoğrafı çözer ama iOS nedeniyle diğer Mayın Tarlası uygulamasına otomatik dokunamaz. Gerçek oyunda güvenli karelere sen dokunursun. Yanlış tespitte risk almamak için çözüm durdurulur. Önceden konmuş bayrakların doğru olduğu varsayılır.</p></div>
+<div class="footer">Tek HTML dosyası · Giriş gerekmez · Sunucuya görsel gönderilmez</div>
+</main>
+<script>
+'use strict';
+const N=16, boardEl=document.querySelector('#board'),bctx=boardEl.getContext('2d'), statusEl=document.querySelector('#status');
+const photoInfo=document.querySelector('#photoInfo'), preview=document.querySelector('#preview'),pctx=preview.getContext('2d');
+const REF_W=1206,REF_H=2622, REF_X=50.4,REF_Y=928.4,REF_SIDE=1107.2;
+const labels={'?':'Kapalı','.':'Boş','F':'Bayrak','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','X':'Belirsiz'};
+let edited=new Set(), grid=Array(256).fill('?'), selected='?', photo=null, rect=null, marks={safe:[],mine:[],best:null,uncertain:false}, mode=null;
+let templates={}; const TEMPLATE_URLS={"?":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAANklEQVR42u3OAQ0AMAgDMMDo/Lu4DHjSKmgnqW1TB0hISEhISEhISEhISEhISEhISEhISPySeHcRAXWqfrCmAAAAAElFTkSuQmCC",".":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAANklEQVR42u3OAQ0AMAgDMEDe/Au6DHjSKmgnqW1TB0hISEhISEhISEhISEhISEhISEhISPySeNcRATaMx8VPAAAAAElFTkSuQmCC","F":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAAhElEQVR42u2XQQqAIBBFx+go3su1dJ6Yy3mYVhEJwYxoGL2/EzcP/mNGQ0pJnNlKebraYxR/FpkgQJxZ27qnjr848ZoE1AGER8xq/TCscML6QunuCnV8xgmjKznn66BKHUAAAcSABOOv/DaRbFHz4KKOeZ1oKL4tlS7UAQQQQPRaYENzAOyHG18b1rnYAAAAAElFTkSuQmCC","1":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAAWElEQVR42u3UwQnAIBAEQBPyt69LHVaVOizMDuxAMA8jZPZ9cAMLe0RE+jpn2iAQWyGuqetc6uyD9tzqgICAWDxWg+V5sWPqgICAgICAgICAgICAgPg3ogMY4Ac6iKCVaQAAAABJRU5ErkJggg==","2":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAAb0lEQVR42mP08vJiGGjAxDAIwKgjYIAFq+jzSdLUskAy7+lodIw6YtQRo46gUWFFTAlDJMBT7sFtGY2OUUeMOmIIlhNkZPrRRs2oI0YdMeqIwdMDo2JjZzQ6Rh0x6ohRRwyqlhUxja7R6Bh1BDoAAAdHEay6FBKJAAAAAElFTkSuQmCC","3":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAAaUlEQVR42u3YMQrAIBAEQBPS+697lV/2BylSG4goEZxrLRw4WFaPiEh/z5kWGIilEFfroNQ68JqSs3VAQEBMCavXePkcVo3oe26xDggIiO6wGtu4NCsIiK1yoqvsKDUQEBCzXmC+i3ZF3HAOEXy2Vn6VAAAAAElFTkSuQmCC","4":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAAcElEQVR42mP08vJiGGjAxDAIwKgjYICFKqaUC87EKt75Pn00OkYdMeqIUUfQubDCVSKNRseoI0YdMcLKCTyFAZ4WCoVFyGh0jDpi1BGjjiAEGNF65bRrueAp+kajY9QRo44YUuUEeWB0pGbUEcPREQBdTRE448W9WQAAAABJRU5ErkJggg=="};
+const idx=(r,c)=>r*16+c;
+function neighbors(id){const r=id>>4,c=id%16,a=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;const rr=r+dr,cc=c+dc;if(rr>=0&&rr<16&&cc>=0&&cc<16)a.push(idx(rr,cc));}return a;}
+function coord(id){return `(${Math.floor(id/16)+1}, ${id%16+1})`;}
+function clearMarks(){marks={safe:[],mine:[],best:null,uncertain:false};}
+function setStatus(text,bad=false){statusEl.textContent=text;statusEl.style.color=bad?'#ffc0c3':'#e1ecf9';}
+function loadTemplates(){return Promise.all(Object.entries(TEMPLATE_URLS).map(([key,url])=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>{const c=document.createElement('canvas');c.width=44;c.height=44;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(i,0,0);templates[key]=x.getImageData(0,0,44,44).data;resolve();};i.onerror=reject;i.src=url;})));}
+function meanDiff(a,b){let diff=0;for(let k=0;k<a.length;k+=4){diff+=Math.abs(a[k]-b[k])+Math.abs(a[k+1]-b[k+1])+Math.abs(a[k+2]-b[k+2]);}return diff/(44*44*3);}
+function classifyPixels(pixels){
+  let red=0, green=0, blue=0, purple=0, silver=0, dark=0, raised=0;
+  for(let k=0;k<pixels.length;k+=4){const r=pixels[k],g=pixels[k+1],b=pixels[k+2];
+    if(Math.abs(r-g)<18&&Math.abs(g-b)<18&&r>145)silver++;
+    if(r>145&&r>g*1.6&&r>b*1.6&&g<130)red++;
+    if(g>135&&g>r*1.5&&g>b*1.25)green++;
+    if(b>175&&b>g*1.2&&b>r*1.5&&g>110)blue++;
+    if(r>130&&b>170&&g<150&&b>g*1.25)purple++;
+    if(Math.abs(r-74)<9&&Math.abs(g-74)<9&&Math.abs(b-74)<9)dark++;
+    if(Math.abs(r-95)<9&&Math.abs(g-95)<9&&Math.abs(b-95)<9)raised++;
+  }
+  if(silver>60&&red>80)return 'F';
+  const colored=Math.max(blue,green,red,purple);
+  if(colored>65)return ['1','2','3','4'][[blue,green,red,purple].indexOf(colored)];
+  if(dark>500)return '.';
+  if(raised>500)return '?';
+  return null;
+}
+function render(){const S=640,s=S/N;bctx.clearRect(0,0,S,S);
+  if(photo&&rect){bctx.imageSmoothingEnabled=false;bctx.drawImage(photo,rect.x,rect.y,rect.w,rect.h,0,0,S,S);}else{bctx.fillStyle='#3f4751';bctx.fillRect(0,0,S,S);}
+  for(let id=0;id<256;id++){let r=id>>4,c=id%16,x=c*s,y=r*s,v=grid[id];
+    if(!photo){bctx.fillStyle=(v==='?'||v==='X')?'#5a626f':v==='F'?'#88474c':'#303943';bctx.fillRect(x+1,y+1,s-2,s-2);if(v!=='?'&&v!=='.'&&v!=='X'){bctx.fillStyle=v==='F'?'#ff676d':v==='1'?'#65b7fb':v==='2'?'#32df8e':v==='3'?'#ed737e':'#d587ed';bctx.font='bold 23px system-ui';bctx.textAlign='center';bctx.textBaseline='middle';bctx.fillText(v,x+s/2,y+s/2);}}
+    if(edited.has(id)){bctx.fillStyle='rgba(22,45,62,.93)';bctx.fillRect(x+3,y+3,s-6,s-6);bctx.fillStyle=v==='F'?'#ff7b87':v==='2'?'#40ec9b':v==='3'?'#ff7c7c':'#dff5fc';bctx.font='bold 23px system-ui';bctx.textAlign='center';bctx.textBaseline='middle';bctx.fillText(v==='?'?'▧':v==='.'?'□':v,x+s/2,y+s/2);}if(v==='X'){bctx.fillStyle='rgba(255,128,30,.8)';bctx.fillRect(x+3,y+3,s-6,s-6);bctx.fillStyle='#fff';bctx.font='bold 25px system-ui';bctx.textAlign='center';bctx.textBaseline='middle';bctx.fillText('?',x+s/2,y+s/2);}bctx.strokeStyle='rgba(12,19,25,.45)';bctx.lineWidth=1;bctx.strokeRect(x+.5,y+.5,s-1,s-1);
+  }
+  for(const id of marks.safe){let r=id>>4,c=id%16,x=c*s,y=r*s;bctx.fillStyle='rgba(46,240,136,.33)';bctx.fillRect(x+2,y+2,s-4,s-4);bctx.lineWidth=3;bctx.strokeStyle='#46f4a1';bctx.strokeRect(x+2,y+2,s-4,s-4);}
+  for(const id of marks.mine){let r=id>>4,c=id%16,x=c*s,y=r*s;bctx.fillStyle='rgba(246,64,75,.5)';bctx.fillRect(x+2,y+2,s-4,s-4);bctx.strokeStyle='#ff7580';bctx.lineWidth=3;bctx.beginPath();bctx.moveTo(x+10,y+10);bctx.lineTo(x+s-10,y+s-10);bctx.moveTo(x+s-10,y+10);bctx.lineTo(x+10,y+s-10);bctx.stroke();}
+  if(marks.best!==null){let id=marks.best,r=id>>4,c=id%16,x=c*s,y=r*s;bctx.strokeStyle='#ffdc57';bctx.lineWidth=6;bctx.strokeRect(x+3,y+3,s-6,s-6);}
+  document.querySelector('#unknownCount').textContent=grid.filter(x=>x==='?').length;
+  document.querySelector('#safeCount').textContent=marks.safe.length;document.querySelector('#mineCount').textContent=marks.mine.length;
+}
+function updateTypes(){const t=document.querySelector('#types');t.textContent='';for(const v of ['?','.','1','2','3','4','5','6','7','8','F']){const b=document.createElement('button');b.textContent=v==='?'?'▧':v==='.'?'□':v==='F'?'⚑':v;b.title=labels[v];b.classList.toggle('selected',selected===v);b.onclick=()=>{selected=v;updateTypes();document.querySelector('#lastEdit').textContent='Seçili tür: '+labels[v]+'. Tahtada değiştirmek istediğin kareye dokun.'};t.appendChild(b);}}
+boardEl.addEventListener('click',e=>{const box=boardEl.getBoundingClientRect();const c=Math.min(15,Math.floor((e.clientX-box.left)/box.width*16)),r=Math.min(15,Math.floor((e.clientY-box.top)/box.height*16));grid[idx(r,c)]=selected;edited.add(idx(r,c));clearMarks();render();setStatus(`${r+1}. satır, ${c+1}. sütun: ${labels[selected]}. Analiz et düğmesine bas.`);});
+function buildConstraints(board){const constraints=[];for(let id=0;id<256;id++){const v=board[id];if(!/^[0-8]$/.test(v)&&v!=='.')continue;const list=neighbors(id),flags=list.filter(i=>board[i]==='F').length,un=list.filter(i=>board[i]==='?'),required=(v==='.'?0:Number(v))-flags;
+    if(required<0||required>un.length)return {error:`${coord(id)} karesinde ${v==='.'?0:v} yazıyor ama komşu bayraklar / kapalı kareler bu sayıyla çelişiyor. Ekran okumasını veya bayrakları kontrol et.`};
+    if(un.length)constraints.push({ids:un,total:required});}return {constraints};}
+function solveBoard(){clearMarks();if(grid.includes('X')){setStatus('DURDURULDU: Bazı kareler güvenilir biçimde okunamadı. Tahtada ? işareti olan belirsiz kareleri elle düzeltip tekrar analiz et.',true);document.querySelector('#moves').textContent='';render();return;}const base=buildConstraints(grid);if(base.error){setStatus('DURDURULDU: '+base.error,true);document.querySelector('#moves').textContent='';render();return;}
+  const assigned=Array(256).fill(null),assumptions=base.constraints,unitSafe=new Set(),unitMine=new Set();let changed=true;
+  // Kesin mantıkla sabitlenen kareleri tekrar tekrar yay.
+  while(changed){changed=false;for(const con of assumptions){let left=con.total,free=[];for(const id of con.ids){if(assigned[id]===1)left--;else if(assigned[id]===null)free.push(id);}if(left<0||left>free.length){setStatus('ÇELİŞKİ: Tahtayı kontrol et.',true);render();return;}
+     if((left===0||left===free.length)&&free.length){const val=left===0?0:1;for(const id of free){assigned[id]=val;(val===0?unitSafe:unitMine).add(id);}changed=true;}}}
+  let remaining=[];for(const con of assumptions){let total=con.total,ids=[];for(const id of con.ids){if(assigned[id]===1)total--;else if(assigned[id]===null)ids.push(id);}if(ids.length)remaining.push({ids,total});}
+  const varToCons=new Map();remaining.forEach((con,ci)=>con.ids.forEach(id=>{if(!varToCons.has(id))varToCons.set(id,[]);varToCons.get(id).push(ci);}));
+  const seen=new Set(),satSafe=new Set(),satMine=new Set();let skipped=0;
+  // Bağlantılı bilinmeyen kare gruplarını ayrı hesaplayarak maliyeti düşür.
+  for(const start of varToCons.keys()){
+    if(seen.has(start))continue;let stack=[start],vars=[],cis=new Set();seen.add(start);
+    while(stack.length){const id=stack.pop();vars.push(id);for(const ci of varToCons.get(id)){cis.add(ci);for(const other of remaining[ci].ids)if(!seen.has(other)){seen.add(other);stack.push(other);}}}
+    const equations=[...cis].map(i=>remaining[i]);if(vars.length>30){skipped++;continue;}
+    let order=vars.sort((a,b)=>varToCons.get(b).length-varToCons.get(a).length),counts=new Map(order.map(v=>[v,0]));let count=0,nodes=0,aborted=false;
+    const current=new Map();
+    function dfs(depth){if(++nodes>85000||count>40000){aborted=true;return;}
+      if(depth===order.length){count++;for(const id of order)if(current.get(id)===1)counts.set(id,counts.get(id)+1);return;}
+      const v=order[depth];for(const val of [0,1]){current.set(v,val);let valid=true;
+        for(const ci of varToCons.get(v)){const eq=remaining[ci];let ones=0,empty=0;for(const id of eq.ids){if(!current.has(id))empty++;else ones+=current.get(id);}if(ones>eq.total||ones+empty<eq.total){valid=false;break;}}
+        if(valid)dfs(depth+1);if(aborted)break;}
+      current.delete(v);
+    }
+    dfs(0);
+    if(aborted){skipped++;continue;}
+    if(count===0){setStatus('ÇELİŞKİ: Bu sayılara uyan hiçbir mayın yerleşimi yok. Okumaları kontrol et.',true);document.querySelector('#moves').textContent='';render();return;}
+    for(const [id,mines] of counts){if(mines===0)satSafe.add(id);if(mines===count)satMine.add(id);}
+  }
+  marks.safe=[...new Set([...unitSafe,...satSafe])].sort((a,b)=>a-b);marks.mine=[...new Set([...unitMine,...satMine])].sort((a,b)=>a-b);
+  marks.best=marks.safe.length?marks.safe[0]:null;marks.uncertain=skipped>0;
+  const s=marks.safe.length,m=marks.mine.length;
+  let msg=s||m?`Kesin sonuç: ${s} güvenli kare, ${m} mayın. `:'Şimdilik kesin bir hamle bulunamadı. ';
+  if(marks.best!==null)msg+=`İlk basılacak: ${coord(marks.best)}. `;
+  if(skipped)msg+='Bazı büyük olasılık grupları hesaplama sınırına takıldı; gösterilmeyen kareler için karar verilmedi. ';
+  if(!s&&!m)msg+='Rastgele hamle önerilmiyor.';
+  setStatus(msg);
+  const moveText=document.querySelector('#moves');moveText.innerHTML='';
+  if(s){const d=document.createElement('div');d.innerText='Açılabilecek diğer kareler: '+marks.safe.slice(0,18).map(coord).join(' · ')+(s>18?' …':'');moveText.appendChild(d);}
+  if(m){const d=document.createElement('div');d.innerText='Bayrak koy: '+marks.mine.slice(0,18).map(coord).join(' · ')+(m>18?' …':'');moveText.appendChild(d);}
+  render();
+}
+function readShot(){if(!photo||!rect)return;const tmp=document.createElement('canvas');tmp.width=44;tmp.height=44;const ctx=tmp.getContext('2d',{willReadFrequently:true});const detected=[];let uncertain=0;
+  for(let r=0;r<16;r++)for(let c=0;c<16;c++){
+    const cx=rect.x+(c+.5)*rect.w/16,cy=rect.y+(r+.5)*rect.h/16;
+    const patchW=(rect.w/16)*(44/69.2),patchH=(rect.h/16)*(44/69.2);
+    ctx.clearRect(0,0,44,44);ctx.drawImage(photo,cx-patchW/2,cy-patchH/2,patchW,patchH,0,0,44,44);
+    const pixels=ctx.getImageData(0,0,44,44).data;const scores=Object.entries(templates).map(([label,ref])=>[label,meanDiff(pixels,ref)]).sort((a,b)=>a[1]-b[1]);
+    const best=scores[0];let value=classifyPixels(pixels);if(value===null){value=best[1]<30?best[0]:'X';}if(value in templates){const refScore=scores.find(a=>a[0]===value)[1];if(refScore>36)value='X';}if(value==='X')uncertain++;detected.push(value);
+  }
+  grid=detected;edited=new Set();clearMarks();render();photoInfo.textContent=`Fotoğraf okundu (${photo.width}×${photo.height}). ${uncertain} kare belirsiz olarak işaretlendi. Sayıları kontrol et.`;solveBoard();
+}
+function drawPreview(){if(!photo)return;preview.width=photo.width;preview.height=photo.height;pctx.drawImage(photo,0,0);if(rect){pctx.strokeStyle='#56e8ff';pctx.lineWidth=6;pctx.strokeRect(rect.x,rect.y,rect.w,rect.h);pctx.fillStyle='#ffff67';for(const [x,y] of [[rect.x,rect.y],[rect.x+rect.w,rect.y+rect.h]]){pctx.beginPath();pctx.arc(x,y,12,0,Math.PI*2);pctx.fill();}}}
+function setCalMode(next){mode=next;document.querySelector('#topleft').classList.toggle('selected',mode==='tl');document.querySelector('#bottomright').classList.toggle('selected',mode==='br');document.querySelector('#calmsg').textContent=mode==='tl'?'Fotoğrafta tahtanın SOL ÜST köşesine dokun.':mode==='br'?'Fotoğrafta tahtanın SAĞ ALT köşesine dokun.':'Hizalama tamamlandı; Yeniden oku düğmesine bas.';}
+document.querySelector('#topleft').onclick=()=>setCalMode('tl');document.querySelector('#bottomright').onclick=()=>setCalMode('br');
+preview.addEventListener('click',e=>{if(!mode||!rect)return;const bounds=preview.getBoundingClientRect(),x=(e.clientX-bounds.left)/bounds.width*photo.width,y=(e.clientY-bounds.top)/bounds.height*photo.height;
+ if(mode==='tl'){const oldRight=rect.x+rect.w,oldBottom=rect.y+rect.h;rect.x=x;rect.y=y;rect.w=oldRight-x;rect.h=oldBottom-y;setCalMode('br');}else if(mode==='br'){rect.w=x-rect.x;rect.h=y-rect.y;setCalMode(null);}
+ if(rect.w<=0||rect.h<=0){setStatus('Köşeler ters seçildi. Tekrar dene.',true);return;}drawPreview();});
+document.querySelector('#rescan').onclick=()=>{if(rect&&rect.w>0&&rect.h>0){readShot();drawPreview();}};
+document.querySelector('#file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{await ready;const url=URL.createObjectURL(file);const image=new Image();await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;image.src=url;});photo=image;
+   rect={x:photo.width*REF_X/REF_W,y:photo.height*REF_Y/REF_H,w:photo.width*REF_SIDE/REF_W,h:photo.height*REF_SIDE/REF_H};
+   document.querySelector('#calib').classList.remove('hidden');drawPreview();readShot();URL.revokeObjectURL(url);
+ }catch(error){setStatus('Görsel açılamadı: '+error.message,true);}};
+const DEMO=[
+'????????????????','????111?????????','13??1.1?????????','.1?21.2FFFF3????','.1?1..2F433F2???','.1?211111.112???','.1???1.....13???','.11211.....1F???','..........123???','112221....1F2???','1F2FF21..122????','12333F1..1F1????','.1F1111..111????','.11212221.12????','...1F3FF1.1F????','...12F321.12????'
+];
+document.querySelector('#demo').onclick=()=>{photo=null;rect=null;document.querySelector('#calib').classList.add('hidden');grid=DEMO.join('').split('');edited=new Set();if(grid.length!==256){setStatus('Demo hazırlanamadı: tahta boyutu hatalı',true);return;}photoInfo.textContent='Örnek tahta yüklendi: kendi gönderdiğin son ekran görüntüsündeki sayılar ve bayraklar.';solveBoard();};
+document.querySelector('#clear').onclick=()=>{photo=null;rect=null;grid=Array(256).fill('?');edited=new Set();document.querySelector('#calib').classList.add('hidden');clearMarks();photoInfo.textContent='Tahta temizlendi.';document.querySelector('#moves').textContent='';setStatus('Tahta temizlendi.');render();};
+document.querySelector('#solve').onclick=solveBoard;
+updateTypes();render();const ready=loadTemplates().then(()=>{}).catch(err=>setStatus('Görsel tanıma şablonları yüklenemedi: '+err.message,true));
+</script></body></html>
